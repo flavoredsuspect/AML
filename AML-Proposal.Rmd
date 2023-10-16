@@ -1,0 +1,76 @@
+---
+title: "AML-Proposal"
+author: "Riccardo Corsiglia & Antonio Pariente"
+date: "2023-10-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Body Fat Check up
+
+We are Riccardo Corsiglia and Antonio Pariente, and we will be treating the Body Fat Classification problem over the __bodyfat__ dataset from Lib.Stat library. This dataset estimates the percentage of body fat determined by underwater weighting and various circumference measurements for a total of 252 men. 
+
+This dataset made by Roger Johnson in 1995 was chosen for the following reasons:
+
+* It is well documented. By being included in such an important statistical library as Lib.Stat its reliability and understandably will be relevant for the future models.
+
+* Following the previous reasoning, this dataset sample understandably, will give arise to a project where originality is not the main goal. Instead, we aim to exploit, explain and compare models, which we consider can be better done when data remains easily manageable.
+
+* In addition, the increasment of non-healthy lifestyles in western society is a real problem that should be addressed. By constructing a classifier with non-invasive measurements we are giving a useful tool for the people to be aware of their actual health risk.
+
+
+Since the number of observations in relation to the explanatory variables is reasonable, we will implement SVM classification with different kernels, custom and popular ones. These SVM methods are well know to fit well a problem in which the dataset size is not very large which, for flexibility reasons, is the one we are facing here.
+
+## Data Exploration
+
+As has been said in the below sections, the dataset is composed of 252 samples. It consists in 14 explanatory variables of numerical nature and a target one.
+
+ * Density determined from underwater weighing
+ * Percent body fat from Siri's (1956) equation
+ * Age (years)
+ * Weight (lbs)
+ * Height (inches)
+ * Neck circumference (cm)
+ * Chest circumference (cm)
+ * Abdomen 2 circumference (cm)
+ * Hip circumference (cm)
+ * Thigh circumference (cm)
+ * Knee circumference (cm)
+ * Ankle circumference (cm)
+ * Biceps (extended) circumference (cm)
+ * Forearm circumference (cm)
+ * Wrist circumference (cm)
+
+
+```{r cars}
+data <- read.table("~/R/fat.txt", quote="\"", comment.char="")
+names=c("density", "fat_pct", "age,weight","height,neck_cm", "chest_cm", "ab_cm","hip_cm","thigh_cm","knee_cm","ankle_cm","biceps_cm","forearm_cm","wrist_cm")
+colnames(data)=names
+na=sum(is.na(data))
+out=sum(data["fat_pct"]<0.01)
+data=data[-(data["fat_pct"]<0.01),]
+```
+A total of `r na` Na variables were found. The Target variable fat_pct was also explored in search of outstanding values, `r out` observations were below the human possible levels of fat percentage and therefore it was removed.
+
+For the project a total of two analysis will be performed, one will build a classifier with the 14 explanatory variables. The other one will try to achieve the best possible results by removing the _density_ variable. This is taken into account since we want the classifier to be usable in the simplest way and by most of the population. To our understanding, measuring wrists, biceps or necks circumferences is in inside everyone's capabilities. However it is not the case for water-measured density of the body which requires specialized equipment.
+
+```{r}
+hist(data$fat_pct)
+```
+
+
+For the classification task the target variable _fat_pct_ has been cut into categories. At first, the project will be done with three levels, however, different configurations will be also tried.
+
+```{r}
+df=data
+df$fat_pct=cut(data$fat_pct, 3, labels=c("Low","Medium","High"))
+barplot(table(df$fat_pct))
+```
+```{r}
+df$fat_pct=cut(data$fat_pct, 2, labels=c("Low","High"))
+barplot(table(df$fat_pct))
+```
+
